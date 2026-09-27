@@ -336,7 +336,7 @@ class PinStore:
     """
 
     def __init__(self, path: str | Path | None = None):
-        self.path = Path(path) if path else None
+        self.path = Path(path).expanduser() if path else None
         self.handles: dict[str, str] = {}
         self.authorities: dict[str, str] = {}
         self.conflicts: dict[str, dict[str, Any]] = {}

@@ -421,17 +421,40 @@ class AgentMesh:
             if m is not None and m._manifest is not None:
                 m._spawn(m.drain_mailbox())
 
+        refused: asyncio.Event = asyncio.Event()
+        refusal: list[str] = []
+
         async def error_cb(exc: Exception) -> None:
+            text = str(exc)
+            if holder.get("mesh") is None and ("uthorization" in text or "xpired" in text):
+                refusal.append(text)
+                refused.set()
             m = holder.get("mesh")
             if m is not None and m.on_warning is not None:
-                m.on_warning({"code": "transport_error", "message": str(exc)})
+                m.on_warning({"code": "transport_error", "message": text})
 
         opts["reconnected_cb"] = reconnected_cb
         opts["error_cb"] = error_cb
         if nats_options:
             opts.update(nats_options)
+        # nats-py keeps retrying a first connection the server refuses for
+        # authorization, so a revoked or wrong credential would hang here. Race
+        # the connect against the first refusal and an overall deadline instead.
+        attempt = asyncio.ensure_future(nats.connect(**opts))
+        watch = asyncio.ensure_future(refused.wait())
+        deadline = connect_timeout * max(1, len(server_list)) * 2 + 5
+        done, _ = await asyncio.wait({attempt, watch}, timeout=deadline, return_when=asyncio.FIRST_COMPLETED)
+        watch.cancel()
+        if attempt not in done:
+            attempt.cancel()
+            if refusal:
+                raise MeshError(ErrorCode.TRANSPORT_PERMISSION_DENIED,
+                                f"{', '.join(server_list)} refused this credential: {refusal[0]}. "
+                                "A refusal after joining means the credential was revoked or does not match its key.",
+                                retryable=False)
+            raise MeshError(ErrorCode.AGENT_UNAVAILABLE, f"could not connect to {', '.join(server_list)} within {deadline:g}s")
         try:
-            nc = await nats.connect(**opts)
+            nc = attempt.result()
         except Exception as exc:
             raise MeshError(ErrorCode.TRANSPORT_PERMISSION_DENIED if "uthoriz" in str(exc) else ErrorCode.AGENT_UNAVAILABLE,
                             f"could not connect to {', '.join(server_list)}: {exc}") from exc

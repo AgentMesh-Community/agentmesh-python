@@ -368,7 +368,7 @@ class Credentials:
         )
 
     def save(self, folder: str | Path) -> Path:
-        d = Path(folder)
+        d = Path(folder).expanduser()
         d.mkdir(parents=True, exist_ok=True)
         save_seed(d / "agent.seed", self.agent_seed)
         if self.jwt and self.connection_seed:
@@ -384,7 +384,7 @@ class Credentials:
 
     @classmethod
     def load(cls, folder: str | Path) -> "Credentials":
-        d = Path(folder)
+        d = Path(folder).expanduser()
         agent_seed = load_seed(d / "agent.seed")
         jwt = conn_seed = None
         if (d / "mesh.creds").exists():
