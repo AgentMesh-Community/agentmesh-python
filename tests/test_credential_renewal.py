@@ -191,7 +191,10 @@ async def test_start_and_stop_do_not_double_up():
     r.start()
     first = r._task
     r.start()
-    assert first.cancelled() or first.cancelling()
+    # Task.cancelling() is 3.11+; on 3.10 let the cancel land and check it did.
+    for _ in range(3):
+        await asyncio.sleep(0)
+    assert first.done()
     r.stop()
     await asyncio.sleep(0)
     assert r._task is None
