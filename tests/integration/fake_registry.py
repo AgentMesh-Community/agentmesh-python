@@ -73,6 +73,8 @@ class FakeRegistry:
         agents = [self._stamp(m) for m in self.manifests.values()]
         if q.get("agent_ids"):
             agents = [m for m in agents if m["id"] in q["agent_ids"]]
+        if q.get("capabilities"):
+            agents = [m for m in agents if set(q["capabilities"]) <= set(m.get("capabilities") or [])]
         if q.get("offering_id"):
             agents = [m for m in agents if any(o.get("id") == q["offering_id"] for o in m.get("offerings") or [])]
         await msg.respond(self._reply(req, {"agents": agents, "total": len(agents)}))
