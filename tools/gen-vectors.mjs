@@ -229,7 +229,7 @@ const proposalInputs = [
   ["Genesis", "stephen@example.com"], ["  Two  Words ", null], ["ÄÖÜ-bot", "x@y.io"],
   ["a".repeat(80), "Owner@Example.COM"], ["", "a@b.co"], [null, null], ["under_score", " spaced@mail.org "],
 ];
-const proposals = proposalInputs.map(([name, email]) => ({ name, email, ...ts.proposeHandle(name, email) }));
+const proposals = proposalInputs.map(([name, email]) => ({ input_name: name, input_email: email, ...ts.proposeHandle(name, email) }));
 const handleChecks = [
   "genesis.stephen@example.com", "a.b@c.d", "no-dot@example.com", "x.y@z", "UABC", "a.b@c.d.e", "a..b@c.de", "a.b c@d.ef",
 ].map((h) => ({ handle: h, standard: ts.isStandardHandle(h) }));

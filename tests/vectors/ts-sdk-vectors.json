@@ -22,16 +22,16 @@
       "public": "UD4YSRPEYWVF56UG4L4QSLMMY3ETOCI7P7C6A6SZV6KUYRHHRIGVY42Q"
     },
     {
-      "seed": "SUAEYI5GI7K7JHC5TLIYAZ2ZTYQKUEQEOJQ7TOZF72MW5OBZETVE5PNTTI",
-      "public": "UDZOBBISWNS7MBTDJRNK7DAR66ZDD7ADX5S43Y43ZUTUWJ5WPSS63YXF"
+      "seed": "SUABQON2EPTCMBZ2WZPAMRT4SNFLD7NZJYIFKQH2L7DCQYQXTDGRFQOCGQ",
+      "public": "UBYCO4SBLRJY4XEKXNPVQJWBJDI4RWC2LKSDGLG46QDL7KMVNDAYFGYM"
     },
     {
-      "seed": "SUAJ4ZIW3DWV5QIKBE7LTKP7JSWOE43L775DIPH2DERNTUTTXZHNBBVIFM",
-      "public": "UC4IMYIFRUJPZB6ASNMZESDKEFIY7XOH2RIHZS6LWVMDZRAHLY5MV5TX"
+      "seed": "SUAFPJFOEHMIMOMSDSV73RLLW665ATG2C5KCNBOVU5Q32ORIUO6ZIYNBEM",
+      "public": "UBIIUOYEZMZXDORCMAJTZE7CS3PNQ6LPYL5M2GJGTBJLA7QDSULNTLSP"
     },
     {
-      "seed": "SUAEZIWTQI45CF6XO5UDBAV4DDXXMKRVICC2INCUM7CRUYGTEZYSOTX2JI",
-      "public": "UDR5WERPJLTLVC77TECPU6KNSCFFYGISR7XP23G7QAAH7TBMYVVM3A2A"
+      "seed": "SUAF7ZJ5WHP3DZTIGDAUD6M2PGANCZMPRALG34A2E3GC4HLH6UWZYOPM34",
+      "public": "UBKNBRS6OTUOJLCTDKP353N3RO7GVSEUVBMYTPAJCJDPCTIJQCMIIHCV"
     }
   ],
   "raw_sign": [
@@ -46,19 +46,19 @@
       "sig_b64": "x8cM32RHtLU1UmwwfTOV4yghqtMO6eoLO1/i/pKNHO3EAQCrbvhvskukfRynyO8AVRIcciCWd5UoUgl5Sf1GAQ=="
     },
     {
-      "seed": "SUAEYI5GI7K7JHC5TLIYAZ2ZTYQKUEQEOJQ7TOZF72MW5OBZETVE5PNTTI",
-      "message": "agentmesh-python raw signing vector for UDZOBBISWNS7MBTDJRNK7DAR66ZDD7ADX5S43Y43ZUTUWJ5WPSS63YXF",
-      "sig_b64": "8WcZ9gWH9ijN/W2qwQkldmjnQnSQGiLCXbUP73JsJx5d1zzDQbFRkZLsdUwbM897GbAYaL6b8ytlMwAy5Q++Ag=="
+      "seed": "SUABQON2EPTCMBZ2WZPAMRT4SNFLD7NZJYIFKQH2L7DCQYQXTDGRFQOCGQ",
+      "message": "agentmesh-python raw signing vector for UBYCO4SBLRJY4XEKXNPVQJWBJDI4RWC2LKSDGLG46QDL7KMVNDAYFGYM",
+      "sig_b64": "9/hugWG33ZykruA5uRCPMyH3DJnNNyVxNThBBra22cSUOmDGoKSX+fA0lV6Gf/mwu4PKKgaQoWfAcvTSZbk0BQ=="
     },
     {
-      "seed": "SUAJ4ZIW3DWV5QIKBE7LTKP7JSWOE43L775DIPH2DERNTUTTXZHNBBVIFM",
-      "message": "agentmesh-python raw signing vector for UC4IMYIFRUJPZB6ASNMZESDKEFIY7XOH2RIHZS6LWVMDZRAHLY5MV5TX",
-      "sig_b64": "ScUuNLUR1sjsUpH/wMhnnHauqxzM5No+6L9wvjj+GPmsJ5h3mnj7Nf0pwTtcmLOq5JbFxPFjiQ56ywZpjVwlCQ=="
+      "seed": "SUAFPJFOEHMIMOMSDSV73RLLW665ATG2C5KCNBOVU5Q32ORIUO6ZIYNBEM",
+      "message": "agentmesh-python raw signing vector for UBIIUOYEZMZXDORCMAJTZE7CS3PNQ6LPYL5M2GJGTBJLA7QDSULNTLSP",
+      "sig_b64": "RKJMGNxD8+TAkeU4ezGSkoWeBQjP4ExMJZKqAnlXt66uFfd0o351TXQIoLZ6OeB6VBOMb0T16CDbvzCT/4qpCQ=="
     },
     {
-      "seed": "SUAEZIWTQI45CF6XO5UDBAV4DDXXMKRVICC2INCUM7CRUYGTEZYSOTX2JI",
-      "message": "agentmesh-python raw signing vector for UDR5WERPJLTLVC77TECPU6KNSCFFYGISR7XP23G7QAAH7TBMYVVM3A2A",
-      "sig_b64": "aMrI3JdeIxnTTUknkK3O59jK+5jaWFIPFeGVGb1FOqZEZsKmCv9MHx7TeFYROYZCmdWsMBGqaVaYK+op0PaBCg=="
+      "seed": "SUAF7ZJ5WHP3DZTIGDAUD6M2PGANCZMPRALG34A2E3GC4HLH6UWZYOPM34",
+      "message": "agentmesh-python raw signing vector for UBKNBRS6OTUOJLCTDKP353N3RO7GVSEUVBMYTPAJCJDPCTIJQCMIIHCV",
+      "sig_b64": "yEpVtbisd1syVTzocSV24hiYYclz7G3Kynn8L1ZeXttfGnpghFhiiRL+AAU1nP3Nnir4wXa59UzPr9z0TBtXCw=="
     }
   ],
   "canonical": [
@@ -485,36 +485,50 @@
     "words": "AgentMesh uses one global standard for agent names: the agent's name, a dot, and its owner's email. That way no two agents anywhere have the same name. This agent does not have one yet, so nothing was sent.",
     "proposals": [
       {
+        "input_name": "Genesis",
+        "input_email": "stephen@example.com",
         "name": "genesis",
         "email": "stephen@example.com",
         "handle": "genesis.stephen@example.com"
       },
       {
+        "input_name": "  Two  Words ",
+        "input_email": null,
         "name": "two-words",
         "email": null,
         "handle": "two-words.<owner's email>"
       },
       {
+        "input_name": "ÄÖÜ-bot",
+        "input_email": "x@y.io",
         "name": "bot",
         "email": "x@y.io",
         "handle": "bot.x@y.io"
       },
       {
+        "input_name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "input_email": "Owner@Example.COM",
         "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "email": "owner@example.com",
         "handle": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.owner@example.com"
       },
       {
+        "input_name": "",
+        "input_email": "a@b.co",
         "name": null,
         "email": "a@b.co",
         "handle": "<agent name>.a@b.co"
       },
       {
+        "input_name": null,
+        "input_email": null,
         "name": null,
         "email": null,
         "handle": "<agent name>.<owner's email>"
       },
       {
+        "input_name": "under_score",
+        "input_email": " spaced@mail.org ",
         "name": "under_score",
         "email": "spaced@mail.org",
         "handle": "under_score.spaced@mail.org"
