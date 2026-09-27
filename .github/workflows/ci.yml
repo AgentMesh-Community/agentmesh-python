@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: pytest (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    env:
+      NATS_SERVER_VERSION: v2.15.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install
+        run: pip install -e ".[dev,langchain]"
+      # The integration tests start a throwaway nats-server on 127.0.0.1 and
+      # skip when they cannot find one.
+      - name: Download nats-server
+        run: |
+          curl -sSfL -o nats.tar.gz "https://github.com/nats-io/nats-server/releases/download/${NATS_SERVER_VERSION}/nats-server-${NATS_SERVER_VERSION}-linux-amd64.tar.gz"
+          mkdir -p tools/.bin && tar -xzf nats.tar.gz -C tools/.bin
+          echo "NATS_SERVER_BIN=$(ls "$PWD"/tools/.bin/*/nats-server)" >> "$GITHUB_ENV"
+      # The cross-language test runs a TypeScript SDK agent beside a Python one.
+      - uses: actions/checkout@v4
+        with:
+          repository: AgentMesh-Community/agentmesh-typescript
+          path: agentmesh-typescript
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the TypeScript SDK
+        run: npm ci --no-audit --no-fund
+        working-directory: agentmesh-typescript
+      - name: pytest
+        env:
+          AGENTMESH_TS: ${{ github.workspace }}/agentmesh-typescript
+        run: pytest -rs

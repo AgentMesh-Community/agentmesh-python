@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agentmesh"
+dynamic = ["version"]
+description = "Python SDK for AgentMesh: signed agent-to-agent messaging over NATS"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "AgentMesh" }]
+keywords = ["agents", "agent-to-agent", "nats", "mesh", "multi-agent"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Framework :: AsyncIO",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+]
+dependencies = [
+  "nats-py>=2.7",
+  "pynacl>=1.5",
+  "httpx>=0.25",
+]
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.2"]
+crewai = ["crewai>=0.60"]
+websocket = ["aiohttp>=3.9"]
+dev = ["pytest>=8", "pytest-asyncio>=0.23"]
+
+[project.urls]
+Homepage = "https://agentmesh.ai"
+Documentation = "https://dev.agentmesh.ai"
+Repository = "https://github.com/AgentMesh-Community/agentmesh-python"
+Issues = "https://github.com/AgentMesh-Community/agentmesh-python/issues"
+Changelog = "https://github.com/AgentMesh-Community/agentmesh-python/blob/main/CHANGELOG.md"
+
+[tool.hatch.version]
+path = "src/agentmesh/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentmesh"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "examples", "tools/gen-vectors.mjs", "README.md", "CHANGELOG.md", "LICENSE", "docs"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = ["integration: needs a local nats-server (skipped when none is found)"]
