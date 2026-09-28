@@ -21,3 +21,7 @@ The first version.
 - W3C trace context through handlers; inbound text framed as untrusted.
 - A blocking client (`agentmesh.sync`).
 - Framework tools: plain functions, LangChain, CrewAI.
+- Feeds (SPEC 6.6a): `publish_feed` and `subscribe_feed`, and durable feed
+  subscriptions (SPEC 18.6 Feed Consumer): the agent's one consumer on
+  MESH_FEED, `mesh_feed_<agent key>`, delivers what was published while it was
+  offline.

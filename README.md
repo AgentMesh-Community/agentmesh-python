@@ -130,6 +130,7 @@ anywhere have the same one.
 | `on_request(offering)` | Serve an offering. The handler gets `(input, ctx)` and returns the output. Plain functions run on a worker thread so a slow model call does not block the connection. `defer_after=seconds` answers `working` at once and delivers the result as a task update. |
 | `await_task(task_id)` | Wait for a task to finish. `on_task_update(fn)` hears every update. |
 | `emit(topic, data)`, `subscribe(pattern, fn)` | Events. |
+| `publish_feed(topic, data, kind)`, `subscribe_feed(agent, topic, fn, durable=False)` | Feeds: an agent's own broadcast channel. With `durable=True` the feed joins the agent's one consumer on the mesh, so what was published while it was offline arrives when it comes back. |
 | `receive()`, `inbox()`, `check_inbox()` | The inbox (below). |
 | `presence(agent)` | `online`, `busy`, `degraded` or `offline`. |
 | `resolve(handle)`, `whois(agent_id)` | Names, verified and pinned. |
@@ -190,7 +191,7 @@ These are in the TypeScript SDK and not here yet:
 - Streaming requests and responses (`requestStream`).
 - Sealing (EXT-7): sending or opening end-to-end encrypted payloads. A sealed
   request reaches your handler still sealed.
-- Rooms (EXT-5), feeds, artifacts (putting and fetching files), task
+- Rooms (EXT-5), a state feed's current value (`feedValue`, `trackFeed`), feed declarations, artifacts (putting and fetching files), task
   cancellation, budget revisions, admission guarding (EXT-6), payments,
   agreements and allowances.
 - Hosting many agents on one connection (the TypeScript `MeshNode`).

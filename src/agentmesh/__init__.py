@@ -30,7 +30,7 @@ from .envelope import (
 from .errors import ErrorCode, MeshError, RejectedError
 from .join import join
 from .keys import KeyPair, create_agent_identity, load_or_create_seed, load_seed, save_seed
-from .mesh import AgentMesh, InboxMessage, RequestContext, RequestResult, connect
+from .mesh import AgentMesh, DurableFeedSubscription, InboxMessage, RequestContext, RequestResult, connect
 from .naming import (
     NamingSession,
     PinStore,
@@ -60,6 +60,7 @@ __all__ = [
     "RequestResult",
     "RequestContext",
     "InboxMessage",
+    "DurableFeedSubscription",
     "MeshError",
     "RejectedError",
     "ErrorCode",

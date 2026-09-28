@@ -285,6 +285,9 @@ class AgentMesh:
         self._drain_lock = asyncio.Lock()
         self._inbox_sub: Any = None
         self._event_subs: list[Any] = []
+        self._feed_lock = asyncio.Lock()
+        self._feed_handlers: dict[str, EventHandler] = {}
+        self._feed_psub: Any = None
         self._closed = False
         self._vouch_expires_at: str | None = None
         self._vouch_renew_at_ms: float | None = None
@@ -1478,6 +1481,26 @@ class AgentMesh:
         env = self._envelope("emit", payload=payload)
         await self._publish(Subjects.event(topic), env, headers={"Nats-Msg-Id": env["id"]})
 
+    async def _dispatch_event(self, env: dict[str, Any], subject: str, handler: EventHandler,
+                              buffered: bool, pattern: str) -> bool:
+        """The SPEC 22 event pipeline, shared by live and durable subscriptions:
+        dedup per pattern, then freshness (the buffered window for a durable
+        delivery, which is old by construction), the size cap, the fence. A
+        refusal returns False and is complete handling; a handler exception
+        propagates to the caller, which decides what it means on its path."""
+        if not self._seen_events.remember(f"{env['from']}|{env['id']}|{pattern}") or not self._fresh(env, buffered):
+            return False
+        payload = env.get("payload") if isinstance(env.get("payload"), dict) else {}
+        size = inbound_text_length(payload.get("data"))
+        if self.max_inbound_chars > 0 and size > self.max_inbound_chars:
+            self._warn({"code": "inbound_oversize", "message": f"Event on {subject} carries {size} characters", "from": env["from"], "subject": subject})
+            return False
+        if self.fence_inbound:
+            payload = {**payload, "data": fence_inbound_input(payload.get("data"), from_=env["from"], trace=env.get("trace"))}
+        with use_trace(env.get("trace")):
+            await _maybe_await(handler(payload, env))
+        return True
+
     async def subscribe(self, pattern: str, handler: EventHandler) -> Any:
         """Call ``handler(payload, envelope)`` for events matching ``pattern``
         (NATS wildcards ``*`` and ``>`` allowed). Returns the subscription."""
@@ -1487,24 +1510,144 @@ class AgentMesh:
                 env = decode(m.data)
             except MeshError:
                 return
-            if not self._seen_events.remember(f"{env['from']}|{env['id']}|{pattern}") or not self._fresh(env, False):
-                return
-            payload = env.get("payload") if isinstance(env.get("payload"), dict) else {}
-            size = inbound_text_length(payload.get("data"))
-            if self.max_inbound_chars > 0 and size > self.max_inbound_chars:
-                self._warn({"code": "inbound_oversize", "message": f"Event on {m.subject} carries {size} characters", "from": env["from"], "subject": m.subject})
-                return
-            if self.fence_inbound:
-                payload = {**payload, "data": fence_inbound_input(payload.get("data"), from_=env["from"], trace=env.get("trace"))}
             try:
-                with use_trace(env.get("trace")):
-                    await _maybe_await(handler(payload, env))
+                await self._dispatch_event(env, m.subject, handler, False, pattern)
             except Exception as exc:
                 self._warn({"code": "event_handler_failed", "message": str(exc), "subject": m.subject})
 
         sub = await self._nc.subscribe(Subjects.event(pattern), cb=cb)
         self._event_subs.append(sub)
         return sub
+
+    # ── feeds (SPEC 6.6a) ─────────────────────────────────────────────────
+
+    async def publish_feed(self, topic: str, data: Any, kind: str = "state") -> None:
+        """Publish to one of this agent's own feeds, ``mesh.feed.{self}.{topic}``:
+        an ordinary emit envelope whose payload is ``{topic, kind, data}``.
+        ``kind`` is ``"state"`` (a current value, the default) or ``"stream"``."""
+        if self.naming_gate is not None:
+            self.naming_gate.require_cached()
+        if kind not in ("state", "stream"):
+            raise MeshError(ErrorCode.INVALID_ENVELOPE, f'feed kind must be "state" or "stream" (SPEC 6.6a), got {str(kind)[:64]!r}')
+        subject = Subjects.feed(self.agent_id, topic)
+        env = self._envelope("emit", payload={"topic": topic, "kind": kind, "data": data})
+        await self._publish(subject, env, headers={"Nats-Msg-Id": env["id"]})
+
+    async def subscribe_feed(self, agent_id: str, topic: str, handler: EventHandler,
+                             *, durable: bool = False) -> Any:
+        """Follow another agent's feed (SPEC 6.6a): ``topic`` names one feed, or
+        ``"*"`` every feed of that agent. ``handler(payload, envelope)`` gets the
+        ``{topic, kind, data}`` payload. Feed deliveries are ambient: they reach
+        the handler and nothing else, never the inbox.
+
+        Live by default, returning the subscription. With ``durable=True`` it is
+        the SPEC 18.6 Feed Consumer: the feed is added to this agent's one
+        durable consumer on MESH_FEED (``mesh_feed_{agent_id}``), so a publish
+        made while this agent was offline is delivered when it comes back, and
+        one its handler failed on is redelivered. That returns a
+        :class:`DurableFeedSubscription`. A refused JetStream call raises rather
+        than falling back to a live subscription; a credential minted before the
+        feed-consumer grant existed is refused until it is renewed."""
+        pattern = Subjects.feed_pattern(agent_id, topic)
+        if durable:
+            return await self._subscribe_feed_durable(pattern, handler)
+
+        async def cb(m: Msg) -> None:
+            try:
+                env = decode(m.data)
+            except MeshError:
+                return
+            try:
+                await self._dispatch_event(env, m.subject, handler, False, pattern)
+            except Exception as exc:
+                self._warn({"code": "event_handler_failed", "message": str(exc), "subject": m.subject})
+
+        sub = await self._nc.subscribe(pattern, cb=cb)
+        self._event_subs.append(sub)
+        return sub
+
+    async def _subscribe_feed_durable(self, pattern: str, handler: EventHandler) -> "DurableFeedSubscription":
+        from nats.js.api import AckPolicy, ConsumerConfig, DeliverPolicy
+        from nats.js.errors import NotFoundError
+
+        stream = Subjects.FEED_STREAM
+        durable = Subjects.feed_consumer(self.agent_id)
+        async with self._feed_lock:
+            try:
+                js = self._nc.jetstream()
+                filters: list[str] | None
+                info = None
+                try:
+                    info = await js.consumer_info(stream, durable)
+                    cfg = info.config
+                    filters = list(cfg.filter_subjects or ([cfg.filter_subject] if cfg.filter_subject else []))
+                except NotFoundError:
+                    filters = None
+                if filters is None:
+                    await js.add_consumer(stream, ConsumerConfig(
+                        durable_name=durable, ack_policy=AckPolicy.EXPLICIT, deliver_policy=DeliverPolicy.NEW,
+                        ack_wait=30, max_deliver=5, filter_subjects=[pattern],
+                    ))
+                elif pattern not in filters:
+                    cfg = info.config  # type: ignore[union-attr]
+                    cfg.filter_subject = None
+                    cfg.filter_subjects = filters + [pattern]
+                    await js.add_consumer(stream, cfg)
+                if self._feed_psub is None:
+                    self._feed_psub = await js.pull_subscribe_bind(durable=durable, stream=stream)
+                    self._start_loop("feed-consumer", self._feed_loop(self._feed_psub))
+            except Exception as exc:
+                raise MeshError(
+                    ErrorCode.DEPENDENCY_FAILED,
+                    f"subscribe_feed({pattern!r}, durable=True) could not bind this agent's feed consumer "
+                    f"{durable} on {stream}: {exc}. Durable feed subscriptions need JetStream and the "
+                    f"{stream} stream on this mesh, and a credential that grants this agent its own feed "
+                    "consumer (one minted before that grant existed is refused until it is renewed). "
+                    "Not falling back to a live subscription: you asked for durability.",
+                ) from exc
+            self._feed_handlers[pattern] = handler
+        return DurableFeedSubscription(self, durable, pattern, handler)
+
+    async def _feed_loop(self, psub: Any) -> None:
+        """One pull loop per agent (a pull consumer divides its deliveries among
+        whoever pulls). A delivery is dispatched to every handler whose pattern
+        matches its subject and acked after they return; a handler failure
+        leaves it unacked for redelivery; a delivery nobody here follows (yet)
+        is handed back after a few seconds; undecodable bytes are dropped."""
+        while not self._closed:
+            try:
+                msgs = await psub.fetch(FEED_FETCH_BATCH, timeout=FEED_FETCH_WAIT_S)
+            except (NatsTimeoutError, asyncio.TimeoutError):
+                continue
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                self._warn({"code": "feed_consumer_error", "message": str(exc)})
+                await asyncio.sleep(5)
+                continue
+            for m in msgs:
+                try:
+                    env = decode(m.data)
+                except MeshError:
+                    await _quiet(m.ack())
+                    continue
+                claimed = [(p, h) for p, h in list(self._feed_handlers.items()) if _feed_matches(p, m.subject)]
+                if not claimed:
+                    await _quiet(m.nak(delay=FEED_UNCLAIMED_NAK_S))
+                    continue
+                try:
+                    for p, h in claimed:
+                        await self._dispatch_event(env, m.subject, h, True, p)
+                except Exception as exc:
+                    self._warn({"code": "event_handler_failed", "message": str(exc), "subject": m.subject})
+                    continue
+                await _quiet(m.ack())
+
+    async def _stop_feed_consumer(self) -> None:
+        psub, self._feed_psub = self._feed_psub, None
+        self._stop_loops({"feed-consumer"})
+        if psub is not None:
+            await _quiet(psub.unsubscribe())
 
     # ── lifecycle ────────────────────────────────────────────────────────
 
@@ -1550,6 +1693,55 @@ class AgentMesh:
 
     def __repr__(self) -> str:
         return f"AgentMesh(agent_id={self.agent_id!r}, registered={self.registered})"
+
+
+#: The durable feed consumer's pull size and wait, and how long a delivery no
+#: handler follows yet is held back before it comes again (max_deliver bounds it).
+FEED_FETCH_BATCH = 16
+FEED_FETCH_WAIT_S = 5.0
+FEED_UNCLAIMED_NAK_S = 5.0
+
+
+def _feed_matches(pattern: str, subject: str) -> bool:
+    """Whether a feed subject matches a subscription pattern (exact, or ``owner.*``)."""
+    if pattern == subject:
+        return True
+    p, s = pattern.split("."), subject.split(".")
+    return len(p) == 4 and len(s) == 4 and p[3] == "*" and p[:3] == s[:3]
+
+
+async def _quiet(aw: Awaitable[Any]) -> None:
+    try:
+        await aw
+    except Exception:
+        pass
+
+
+class DurableFeedSubscription:
+    """What ``subscribe_feed(..., durable=True)`` returns (SPEC 18.6 Feed Consumer).
+
+    ``stop()`` removes this subscription's handler and, when it was the last,
+    ends the pull loop. It never deletes the consumer or drops the feed from its
+    filters: the consumer is the cursor that delivers what was published while
+    the agent was away.
+    """
+
+    def __init__(self, mesh: "AgentMesh", durable: str, subject: str, handler: EventHandler):
+        self.durable = durable
+        self.subject = subject
+        self._mesh = mesh
+        self._handler = handler
+
+    async def stop(self) -> None:
+        m = self._mesh
+        if m._feed_handlers.get(self.subject) is not self._handler:
+            return
+        del m._feed_handlers[self.subject]
+        if not m._feed_handlers:
+            await m._stop_feed_consumer()
+
+    def __repr__(self) -> str:
+        return f"DurableFeedSubscription(durable={self.durable!r}, subject={self.subject!r})"
 
 
 def _queued_ack(env: dict[str, Any]) -> dict[str, Any] | None:

@@ -83,3 +83,28 @@ class Subjects:
     @staticmethod
     def inbox_durable(agent_id: str) -> str:
         return f"inbox_{_token('agent id', agent_id)}"
+
+    #: The stream-feed history stream (SPEC 18.3), the only stream bound to feeds.
+    FEED_STREAM = "MESH_FEED"
+
+    @staticmethod
+    def feed(agent_id: str, topic: str) -> str:
+        """A feed subject (SPEC 6.6a): ``mesh.feed.{owner}.{topic}``, exactly four
+        tokens. A dotted topic would reach past the owner's grant, so the topic is
+        one token, the same rule as the TypeScript SDK."""
+        return f"mesh.feed.{_token('agent id', agent_id)}.{_token('feed topic', topic)}"
+
+    @staticmethod
+    def feed_pattern(agent_id: str, topic: str) -> str:
+        """The subscribe side of :meth:`feed`: the same grammar, plus topic ``"*"``
+        for every feed of that one owner."""
+        if topic == "*":
+            return f"mesh.feed.{_token('agent id', agent_id)}.*"
+        return Subjects.feed(agent_id, topic)
+
+    @staticmethod
+    def feed_consumer(agent_id: str) -> str:
+        """The agent's one durable feed consumer on MESH_FEED (SPEC 18.6 Feed
+        Consumer). Named for the agent, because a credential grants a consumer
+        only by its whole name. The same name in every SDK."""
+        return f"mesh_feed_{_token('agent id', agent_id)}"
