@@ -32,7 +32,10 @@ def test_bad_checksum_and_non_seeds_are_refused():
     for bad in (broken, "hello", KeyPair.create().public_key):
         with pytest.raises(ValueError):
             KeyPair.from_seed(bad)
-    assert not is_agent_id(KeyPair.create().public_key[:-1] + "A")
+    # Change the last character, whatever it was: replacing it with "A" alone
+    # changed nothing whenever the key already ended in "A" (1 run in 32).
+    pub = KeyPair.create().public_key
+    assert not is_agent_id(pub[:-1] + ("A" if pub[-1] != "A" else "B"))
 
 
 def test_seed_file_round_trip(tmp_path):
