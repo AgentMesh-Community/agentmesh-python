@@ -58,6 +58,7 @@ from .naming import (
     complete_naming,
     registrar_name_lookup,
 )
+from .revoked_senders import RevocationAnswer, RevokedSender, RevokedSenders
 from .subjects import Subjects, is_publishable_subject, is_subject_token
 from .tasks import TERMINAL_STATES, Task, TaskTracker
 from .trace import child_span, use_trace
@@ -292,6 +293,10 @@ class AgentMesh:
         self._vouch_expires_at: str | None = None
         self._vouch_renew_at_ms: float | None = None
         self._vouch_last_error: str | None = None
+        # SPEC 5.3: senders the registry says are revoked or paused are refused
+        # before their request is handled. None when the host turned it off
+        # (connect(refuse_revoked_senders=False)).
+        self._revoked_senders: RevokedSenders | None = RevokedSenders(self._registry_revocation)
         # set by connect()
         self.fence_inbound = True
         self.max_inbound_chars = DEFAULT_MAX_INBOUND_CHARS
@@ -329,6 +334,7 @@ class AgentMesh:
         pin_store: PinStore | str | None = None,
         fence_inbound: bool = True,
         max_inbound_chars: int = DEFAULT_MAX_INBOUND_CHARS,
+        refuse_revoked_senders: bool = True,
         inbox: bool = True,
         inbox_capacity: int = DEFAULT_INBOX_CAPACITY,
         mailbox_drain_interval: float = DEFAULT_MAILBOX_DRAIN_INTERVAL_S,
@@ -358,6 +364,12 @@ class AgentMesh:
         ``require_named`` is the naming rule and is on by default: every send
         this agent starts is refused with NOT_NAMED until its handle follows the
         global standard at the naming service. ``False`` is for tests only.
+
+        ``refuse_revoked_senders`` is on by default: before a request is
+        handled, the registry is asked (with a short memo) whether the sender's
+        key is revoked or the sender is paused, and such a sender is refused
+        with UNAUTHORIZED (SPEC 5.3). A registry that cannot answer lets the
+        message through.
         """
         if credentials is not None:
             agent_seed = agent_seed or credentials.agent_seed
@@ -466,6 +478,8 @@ class AgentMesh:
         holder["mesh"] = mesh
         mesh.fence_inbound = fence_inbound
         mesh.max_inbound_chars = max_inbound_chars
+        if not refuse_revoked_senders:
+            mesh._revoked_senders = None
         mesh.inbox_enabled = inbox
         mesh.inbox_capacity = inbox_capacity
         mesh.mailbox_drain_interval = max(1.0, mailbox_drain_interval)
@@ -824,6 +838,35 @@ class AgentMesh:
         if isinstance(m, dict) and m.get("id") == agent_id:
             self._cache_manifest(m)
         return m  # type: ignore[return-value]
+
+    async def _registry_revocation(self, key: str) -> RevocationAnswer:
+        """Ask the registry whether ``key`` is a revoked agent key (SPEC 5.3).
+
+        A registry ``get`` answers a revoked key with ``UNAUTHORIZED``,
+        ``details.reason: agent_key_revoked``, and a paused agent (the kill
+        switch, SPEC 4.12) with a manifest whose ``status`` is ``paused``. Any
+        other answer, a manifest or not-found included, means not revoked.
+        Anything that is not a verified answer from the registry to this
+        question is ``unknown``, which the memo treats as "let it through".
+        """
+        env = self._envelope("discover", payload={"agent_id": key})
+        try:
+            msg = await self._nc.request(Subjects.registry_get(key), encode(env), timeout=RevokedSenders.LOOKUP_TIMEOUT_S)
+            resp = decode(msg.data)
+            self._bind_response(resp, env, subject="mesh.registry.get")
+        except Exception:
+            return RevocationAnswer("unknown")
+        err = resp.get("error") if isinstance(resp.get("error"), dict) else None
+        details = err.get("details") if err is not None and isinstance(err.get("details"), dict) else {}
+        if err is not None and err.get("code") == ErrorCode.UNAUTHORIZED and details.get("reason") == "agent_key_revoked":
+            at, to = details.get("revoked_at"), details.get("replaced_by")
+            return RevocationAnswer("revoked", revoked_at=at if isinstance(at, str) else None,
+                                    replaced_by=to if isinstance(to, str) else None)
+        payload = resp.get("payload") if isinstance(resp.get("payload"), dict) else {}
+        if payload.get("status") == "paused":
+            since = payload.get("status_since")
+            return RevocationAnswer("paused", since=since if isinstance(since, str) else None)
+        return RevocationAnswer("not_revoked")
 
     def _cache_manifest(self, m: Any) -> None:
         if not isinstance(m, dict) or not isinstance(m.get("id"), str) or not m["id"]:
@@ -1194,6 +1237,17 @@ class AgentMesh:
         meta = env.get("meta") if isinstance(env.get("meta"), dict) else {}
         if isinstance(meta.get("hops"), int) and meta["hops"] > MAX_HOPS:
             return "done"
+        # SPEC 5.3: "A message signed by a revoked agent key MUST be rejected."
+        # decode() proved which key signed; this asks whether that key is still
+        # its owner's, and whether its agent is paused (4.12). After the cheap
+        # checks, so a malformed or replayed envelope costs no registry
+        # question, and before anything is handled or answered as though the
+        # sender were who it says.
+        if self._revoked_senders is not None:
+            refused = await self._revoked_senders.check(env["from"])
+            if refused is not None:
+                await self._refuse_sender(env, refused)
+                return "done"
         irt = env.get("in_reply_to")
         if isinstance(irt, str) and irt in self._pending and env["from"] == self._pending[irt].agent_id:
             p = self._pending[irt]
@@ -1234,6 +1288,33 @@ class AgentMesh:
             await self._send_respond(env, {"status": "accepted"}, task_id=None, reply_subject=reply, via_reply=via_reply)
         await self._dispatch(handler, offering, framed, env, reply, via_reply, buffered)
         return "done"
+
+    async def _refuse_sender(self, env: dict[str, Any], refused: RevokedSender) -> None:
+        """Answer a revoked or paused sender with UNAUTHORIZED (SPEC 5.3)."""
+        details: dict[str, Any]
+        if refused.paused:
+            # The kill switch: the sender's node may still be able to publish,
+            # so the receiver refusing is what makes the pause hold. Unlike a
+            # revocation, a pause is lifted, and the memo says so again within
+            # a minute of the resume.
+            details = {"reason": "agent_paused"}
+            if refused.since:
+                details["stopped_at"] = refused.since
+            message = ("The agent that sent this is paused by its owner or by AgentMesh, so its messages "
+                       "are refused until it is resumed (§5.3).")
+            warning = {"code": "stopped_sender", "message": "refused a request from an agent that is paused by the kill switch"}
+        else:
+            details = {"reason": "agent_key_revoked"}
+            if refused.revoked_at:
+                details["revoked_at"] = refused.revoked_at
+            if refused.replaced_by:
+                details["replaced_by"] = refused.replaced_by
+            message = "The key that signed this message has been revoked, so it is refused (§5.3)."
+            moved = f"; the agent moved to {refused.replaced_by}" if refused.replaced_by else ""
+            warning = {"code": "revoked_sender", "message": f"refused a request signed by a revoked key{moved}"}
+        error = {"code": ErrorCode.UNAUTHORIZED.value, "message": message, "details": details, "retryable": False}
+        await self._send_respond(env, {"status": "failed"}, error=error)
+        self._warn({**warning, "from": env["from"], "subject": self.agent_id})
 
     async def _hold(self, item: InboxMessage, key: str, env: dict[str, Any], reply: str | None) -> str:
         if len(self._inbox_items) >= self.inbox_capacity:

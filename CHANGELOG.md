@@ -25,3 +25,14 @@ The first version.
   subscriptions (SPEC 18.6 Feed Consumer): the agent's one consumer on
   MESH_FEED, `mesh_feed_<agent key>`, delivers what was published while it was
   offline.
+- Revoked and paused senders are refused (SPEC 5.3). Before a request is
+  handled, the SDK asks the registry about the sender's key. A revoked key is
+  answered `UNAUTHORIZED` with `details.reason: agent_key_revoked` and refused
+  for the life of the process; a sender paused by the kill switch is answered
+  `UNAUTHORIZED` with `agent_paused` and remembered for a minute. A registry
+  that cannot answer lets the message through. `on_warning` hears
+  `revoked_sender` and `stopped_sender`. Turn it off with
+  `connect(..., refuse_revoked_senders=False)`.
+- A refused credential renewal raises `CredentialRefusedError`, which carries
+  the mesh's code (`agent_paused` and `agent_terminated` mean the kill switch),
+  `retry_after_seconds` and the stopped agents.

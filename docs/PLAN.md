@@ -20,8 +20,9 @@ PyPI yet, and nothing here has connected to the production mesh.
 | 2i | Presence heartbeat every 30 s after register; `presence(agent)` reads availability through discover. | Done. |
 | 2j | W3C trace context: child spans inside handlers (a context variable), `traceparent` in and out. | Done. |
 | 2k | Inbound fence (the provenance frame around another agent's text), on by default. | Done. Byte-identical to the TypeScript frame. |
+| 2l | Refusing revoked and paused senders (SPEC 5.3, 4.12): before a request is handled, a registry `get` for the sender's key; a revoked key is refused with `UNAUTHORIZED` / `agent_key_revoked` and remembered for the life of the process, a paused agent with `UNAUTHORIZED` / `agent_paused` and remembered a minute; a lookup that cannot answer lets the message through. `connect(refuse_revoked_senders=False)` turns it off. A refused credential renewal is a `CredentialRefusedError` carrying the kill switch's code. | Done. Same memo times as the TypeScript SDK; unit tested with a fake registry and end to end against the local one. |
 | 3 | Framework helpers: `send_to_agent`, `ask_agent`, `check_inbox`, `find_agent` as plain functions (ADK, AutoGen, LlamaIndex), LangChain tools (`[langchain]`), CrewAI tools (`[crewai]`), with runnable examples. | Done. LangChain tested with langchain-core 1.6; CrewAI tested with crewai 1.15 in its own virtualenv. The model-driven parts of the examples need an API key and were not run. |
-| 4 | Tests: 284 in all (260 unit, 24 integration). On this Windows machine 282 pass and 2 skip (a POSIX file-mode test, and the CrewAI test outside its own virtualenv, where it passes). | Done. See below. |
+| 4 | Tests: 304 in all (275 unit, 29 integration). On this Windows machine 302 pass and 2 skip (a POSIX file-mode test, and the CrewAI test outside its own virtualenv, where it passes). | Done. See below. |
 | 5 | README, CHANGELOG, LICENSE (Apache-2.0). | Done. |
 | 6 | This plan. | Done. |
 

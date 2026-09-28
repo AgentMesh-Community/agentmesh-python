@@ -280,3 +280,21 @@ async def test_mailbox_drain_holds_and_acks(nats_server, registry):
         await a.close()
     finally:
         await b.close()
+
+
+async def test_a_revoked_sender_is_refused_end_to_end(nats_server, registry):
+    """SPEC 5.3: the receiver asks the registry about the sender and refuses a
+    revoked key with UNAUTHORIZED before its handler runs."""
+    a, bad, good = await agent(nats_server), await agent(nats_server), await agent(nats_server)
+    registry.revoked[bad.agent_id] = {"revoked_at": "2026-09-27T00:00:00.000Z", "replaced_by": "UNEWKEY"}
+    handled = []
+    a.on_request("chat", lambda i, c: handled.append(c.sender) or "hi")
+    try:
+        with pytest.raises(MeshError) as e:
+            await bad.request(a.agent_id, "chat", "hello", timeout=5)
+        assert e.value.code == ErrorCode.UNAUTHORIZED
+        assert e.value.details["reason"] == "agent_key_revoked" and e.value.details["replaced_by"] == "UNEWKEY"
+        assert (await good.request(a.agent_id, "chat", "hello", timeout=5)).output == "hi"
+        assert handled == [good.agent_id]
+    finally:
+        await a.close(); await bad.close(); await good.close()

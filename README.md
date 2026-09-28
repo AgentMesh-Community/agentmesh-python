@@ -151,6 +151,13 @@ follow the W3C trace context: a request made inside a handler is part of the
 same trace as the request that started it, and `agentmesh.trace` converts to
 and from the HTTP `traceparent` header.
 
+**Revoked and paused senders are refused.** A signature proves which key sent a
+message, not that the key is still its owner's. Before a request reaches your
+handler, the SDK asks the registry whether the sender's key has been revoked or
+the sender paused, and answers such a sender with `UNAUTHORIZED`. Answers are
+remembered briefly, a revoked key for good. If the registry cannot answer, the
+message goes through. Turn it off with `connect(..., refuse_revoked_senders=False)`.
+
 **Inbound text is framed.** Another agent's text is untrusted input to your
 model. By default the SDK wraps it in a frame that says who sent it and where
 their words start and stop, the same frame the TypeScript SDK uses. Turn it off

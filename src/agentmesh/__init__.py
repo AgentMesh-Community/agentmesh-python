@@ -14,6 +14,7 @@
 from ._version import __version__
 from .credential import (
     BootstrapResult,
+    CredentialRefusedError,
     CredentialRenewer,
     Credentials,
     RenewalAgent,
@@ -49,6 +50,7 @@ __all__ = [
     "join",
     "Credentials",
     "CredentialRenewer",
+    "CredentialRefusedError",
     "RenewalAgent",
     "BootstrapResult",
     "exchange_agent_key",

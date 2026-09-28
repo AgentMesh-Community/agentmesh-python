@@ -22,6 +22,8 @@ class FakeRegistry:
         self.kp = KeyPair.create()
         self.manifests: dict[str, dict[str, Any]] = {}
         self.online: set[str] = set()
+        # key -> details the registry gives for a revoked key (SPEC 5.3)
+        self.revoked: dict[str, dict[str, Any]] = {}
         self.nc: Any = None
 
     async def start(self) -> "FakeRegistry":
@@ -83,7 +85,10 @@ class FakeRegistry:
         req = decode(msg.data)
         agent_id = msg.subject.split(".")[-1]
         m = self.manifests.get(agent_id)
-        if m is None:
+        if agent_id in self.revoked:
+            details = {"reason": "agent_key_revoked", **self.revoked[agent_id]}
+            await msg.respond(self._reply(req, error={"code": "UNAUTHORIZED", "message": "this agent key is revoked", "retryable": False, "details": details}))
+        elif m is None:
             await msg.respond(self._reply(req, error={"code": "NOT_FOUND", "message": "no such agent", "retryable": False}))
         else:
             await msg.respond(self._reply(req, self._stamp(m)))

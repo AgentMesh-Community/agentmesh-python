@@ -9,6 +9,7 @@ import pytest
 
 from agentmesh.attestation import RENEWAL_FRACTION
 from agentmesh.credential import (
+    CredentialRefusedError,
     CredentialRenewer,
     Credentials,
     RenewalAgent,
@@ -102,6 +103,34 @@ async def test_refusal_is_surfaced_as_the_mesh_said_it():
     client, _ = mock_mesh([(403, {"error": "agent retired"})])
     with pytest.raises(RuntimeError, match="agent retired"):
         await renew_node_credential("https://api.test", NODE.seed, [RenewalAgent(AGENT.public_key, AGENT.seed)], client=client)
+
+
+async def test_refusal_carries_the_kill_switch_code_so_a_host_waits_instead_of_retrying():
+    stopped = [{"id": AGENT.public_key, "code": "agent_paused"}]
+    client, _ = mock_mesh([(403, {"error": "Agent UABC... is paused by its owner", "code": "agent_paused",
+                                  "retry_after_seconds": 300, "stopped": stopped})])
+    with pytest.raises(CredentialRefusedError) as e:
+        await renew_node_credential("https://api.test", NODE.seed, [RenewalAgent(AGENT.public_key, AGENT.seed)], client=client)
+    err = e.value
+    assert isinstance(err, RuntimeError)
+    assert err.status == 403 and err.code == "agent_paused" and err.is_stopped
+    assert err.retry_after_seconds == 300
+    assert err.stopped == stopped
+    assert "paused by its owner" in str(err)
+
+
+async def test_refusal_without_a_code_is_not_the_kill_switch():
+    client, _ = mock_mesh([(403, {"error": "agent retired"})])
+    with pytest.raises(CredentialRefusedError) as e:
+        await renew_node_credential("https://api.test", NODE.seed, [RenewalAgent(AGENT.public_key, AGENT.seed)], client=client)
+    assert e.value.code is None and not e.value.is_stopped and e.value.retry_after_seconds is None
+
+
+async def test_names_the_agents_the_mesh_left_off_because_they_are_stopped():
+    stopped = [{"id": AGENT.public_key, "code": "agent_paused"}]
+    client, _ = mock_mesh([(200, {"jwt": "x.y.z", "node_id": NODE.public_key, "agents": [], "expires_at": None, "stopped": stopped})])
+    r = await renew_node_credential("https://api.test", NODE.seed, [RenewalAgent(AGENT.public_key, AGENT.seed)], client=client)
+    assert r.stopped == stopped
 
 
 def renewer(claims, answers, clock_ms, **kw):

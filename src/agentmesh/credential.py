@@ -41,6 +41,7 @@ __all__ = [
     "CredentialClaims",
     "RenewalAgent",
     "RenewedCredential",
+    "CredentialRefusedError",
     "BootstrapResult",
     "Credentials",
     "decode_credential_claims",
@@ -174,6 +175,34 @@ class RenewedCredential:
     node_id: str
     agents: list[str]
     expires_at: Optional[str]
+    #: Agents the mesh left off this credential because they are stopped by the
+    #: kill switch (``agent_paused`` or ``agent_terminated``), as
+    #: ``{"id": ..., "code": ...}``. Empty when none is.
+    stopped: list[dict[str, str]] = field(default_factory=list)
+
+
+class CredentialRefusedError(RuntimeError):
+    """The mesh refused a credential.
+
+    ``code`` is the machine reason when the mesh gave one: ``agent_paused`` and
+    ``agent_terminated`` (the kill switch, SPEC 4.12) mean every agent on the
+    roster is stopped, and a host should say so and check back later rather
+    than retry in a loop; ``agent_unnamed`` is the naming rule.
+    """
+
+    def __init__(self, message: str, status: int, code: Optional[str] = None,
+                 stopped: Optional[list[dict[str, str]]] = None, retry_after_seconds: Optional[float] = None):
+        super().__init__(message)
+        self.message = message
+        self.status = status
+        self.code = code
+        self.stopped = list(stopped or [])
+        self.retry_after_seconds = retry_after_seconds
+
+    @property
+    def is_stopped(self) -> bool:
+        """True when the refusal is the kill switch's: every agent is stopped."""
+        return self.code in ("agent_paused", "agent_terminated")
 
 
 def _client(client: httpx.AsyncClient | None) -> tuple[httpx.AsyncClient, bool]:
@@ -206,14 +235,25 @@ async def renew_node_credential(
             data = res.json()
         except ValueError:
             data = {}
-        if not res.is_success or not isinstance(data, dict) or not data.get("jwt"):
-            err = data.get("error") if isinstance(data, dict) else None
-            raise RuntimeError(err or f"credential renewal failed: HTTP {res.status_code}")
+        if not isinstance(data, dict):
+            data = {}
+        stopped = data.get("stopped") if isinstance(data.get("stopped"), list) else []
+        if not res.is_success or not data.get("jwt"):
+            code = data.get("code")
+            retry = data.get("retry_after_seconds")
+            raise CredentialRefusedError(
+                data.get("error") or f"credential renewal failed: HTTP {res.status_code}",
+                res.status_code,
+                code if isinstance(code, str) else None,
+                stopped,
+                retry if isinstance(retry, (int, float)) and not isinstance(retry, bool) else None,
+            )
         return RenewedCredential(
             jwt=data["jwt"],
             node_id=data.get("node_id") or body["node_id"],
             agents=data.get("agents") or [a["id"] for a in body["agents"]],
             expires_at=data.get("expires_at"),
+            stopped=stopped,
         )
     finally:
         if owned:
