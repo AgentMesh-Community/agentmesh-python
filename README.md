@@ -191,6 +191,40 @@ Runnable examples, each against a local nats-server (`nats-server -js`):
 `examples/crewai_crew.py`, `examples/plain_functions.py`. With a real
 credential: `examples/join.py` and `examples/quickstart.py`.
 
+## Acting for a person at a business (PACT)
+
+AgentMesh follows PACT 1.0 (https://openpactprotocol.org) when a person's own
+agent acts for them at a business. `agentmesh.pact` has the same helpers as the
+TypeScript and Rust SDKs. They need `pip install "agentmesh[pact]"`.
+
+An agent that serves a business gets each PACT turn on the request's
+envelope's `meta["pact"]`. Under the person's permission the turn carries a delegation
+token. Check it before acting on anybody's account, then say what you used, so
+the business's receipt can say it too:
+
+```python
+from agentmesh import pact
+
+turn = pact.pact_turn_from_meta(ctx.envelope.get("meta"))
+who = await pact.check_delegation_fetching_keys(
+    ((turn or {}).get("delegation") or {}).get("token"), pa_issuer=(turn or {}).get("pa", ""))
+if pact.missing_scopes(who, ["orders:read"]):
+    return pact.pact_needs_permission("I need your permission to see your orders.", ["orders:read"])
+return pact.pact_report("Your orders: ...", ["orders:read"], [("lookup_orders", None)])
+```
+
+When the person has not allowed what the turn needs, the gateway turns
+`pact_needs_permission` into the step-up, and the person's agent shows them
+the business's link. `args_hash` makes the hash a receipt carries for an
+action's arguments.
+
+If you run your own personal-agent platform, `sign_pa_jwt` makes the JWT each
+request needs, and `send_pact_message` sends a message and reads the answer.
+The answer is either the business agent's reply, with its receipt when it
+acted on the person's account, or `auth_required` with the link to show the
+person. Show them the link to open themselves; never open, fetch or frame it
+for them. `verify_receipt` checks the receipt against the business's keys.
+
 ## Not supported yet
 
 These are in the TypeScript SDK and not here yet:
@@ -217,6 +251,8 @@ Three, each for one job:
   service, over HTTPS.
 
 The framework extras add only the framework (`langchain-core`, `crewai`).
+The `pact` extra adds `cryptography`, for PACT's ES256 signatures (P-256,
+which libsodium does not do).
 
 ## Development
 
@@ -232,7 +268,9 @@ TypeScript SDK (https://github.com/AgentMesh-Community/agentmesh-typescript,
 with `npm ci` run in it) beside this one, or at `$AGENTMESH_TS`.
 
 The signing vectors in `tests/vectors/` come from the TypeScript SDK. To
-regenerate them after a protocol change: `node tools/gen-vectors.mjs`.
+regenerate them after a protocol change: `node tools/gen-vectors.mjs`. The
+PACT vectors come from the TypeScript SDK's PACT source in the AgentMesh
+repository: `node tools/gen-pact-vectors.mjs <path to an AgentMesh checkout>`.
 
 ## Documentation
 
