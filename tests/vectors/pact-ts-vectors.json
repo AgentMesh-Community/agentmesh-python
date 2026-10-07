@@ -1,0 +1,391 @@
+{
+  "made_by": "tools/gen-pact-vectors.mjs from the TypeScript SDK's src/pact",
+  "now": 1791000000,
+  "pa_issuer": "https://pa.example/pact",
+  "interface_url": "https://a2a.agentmesh.ai/a2a/UBRANDEXAMPLE",
+  "brand_keys": {
+    "keys": [
+      {
+        "kty": "EC",
+        "x": "ZQtmduXLjsMKHmSHskoBCX8QYjeGuHUDxqcLT-1scR0",
+        "y": "VTsy_kwA_SRc2UJclEUa0Iepd6iYq3jqBAmaHgQrJkM",
+        "crv": "P-256",
+        "kid": "0kP8Jur_u0IrCNAd3JtXqJhAVAOpZSxjqsw7lzn49do",
+        "alg": "ES256",
+        "use": "sig"
+      }
+    ]
+  },
+  "pa_public_jwk": {
+    "kty": "EC",
+    "x": "_L3K9S_xbUvnPPWbCbxx85O-zFcyD2e3Z0tWRMZOiKA",
+    "y": "eZPdodDUyhI6hb0C6gDjIfyQ8HbB8kgTrhhk-jqWKB0",
+    "crv": "P-256",
+    "kid": "m33kqP6bI2h3Oz2RcZ-8wkZVdYxbPHRoZuRINn-B3LQ",
+    "alg": "ES256",
+    "use": "sig"
+  },
+  "delegations": [
+    {
+      "name": "ok",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUvb2F1dGgiLCJhdWQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzdWIiOiJwZXJzb24tMSIsImNsaWVudF9pZCI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0Iiwic2NvcGUiOiJvcmRlcnM6cmVhZCBvcmRlcnM6cmVhZCIsImdyYW50X2lkIjoicGFjdGdyYW50XzEiLCJpYXQiOjE3OTEwMDAwMDAsImV4cCI6MTc5MTAwMzYwMH0.r8M_QQT4V3PzBRXzHtF5BowWnTdyBMwIyrvGdyfHMZARDUhs_tW2cI_TRCdWAiNOsF2dOMw1frE--a7Ceu8S9A",
+      "expect": {
+        "person": "person-1",
+        "scopes": [
+          "orders:read"
+        ],
+        "grant_id": "pactgrant_1",
+        "interface_url": "https://a2a.agentmesh.ai/a2a/UBRANDEXAMPLE",
+        "expires_at": 1791003600
+      }
+    },
+    {
+      "name": "pinned_to_this_interface",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUvb2F1dGgiLCJhdWQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzdWIiOiJwZXJzb24tMSIsImNsaWVudF9pZCI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0Iiwic2NvcGUiOiJvcmRlcnM6cmVhZCBvcmRlcnM6cmVhZCIsImdyYW50X2lkIjoicGFjdGdyYW50XzEiLCJpYXQiOjE3OTEwMDAwMDAsImV4cCI6MTc5MTAwMzYwMH0.YiURdWs1M7utHi_DMdvjbIhdznU2fzk5ep3vOpD30m925hZXwW5Ont8jDwMpWv9lYvwiFulaBsfyNVbfc0zlWg",
+      "interface_url": "https://a2a.agentmesh.ai/a2a/UBRANDEXAMPLE",
+      "expect": {
+        "person": "person-1",
+        "scopes": [
+          "orders:read"
+        ],
+        "grant_id": "pactgrant_1",
+        "interface_url": "https://a2a.agentmesh.ai/a2a/UBRANDEXAMPLE",
+        "expires_at": 1791003600
+      }
+    },
+    {
+      "name": "pinned_to_another_interface",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUvb2F1dGgiLCJhdWQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzdWIiOiJwZXJzb24tMSIsImNsaWVudF9pZCI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0Iiwic2NvcGUiOiJvcmRlcnM6cmVhZCBvcmRlcnM6cmVhZCIsImdyYW50X2lkIjoicGFjdGdyYW50XzEiLCJpYXQiOjE3OTEwMDAwMDAsImV4cCI6MTc5MTAwMzYwMH0.crfwHAdR3XDo1B9SKg5thwqGJxCmwkUemMkt3BkAt8xoi3RSTk782GgKsviVep9sEN02xQwK_dzEMzsuuBMrVw",
+      "interface_url": "https://a2a.agentmesh.ai/a2a/UOTHER",
+      "expect": null
+    },
+    {
+      "name": "another_gateway",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2V2aWwuZXhhbXBsZS9hMmEvWC9vYXV0aCIsImF1ZCI6Imh0dHBzOi8vZXZpbC5leGFtcGxlL2EyYS9YIiwic3ViIjoicGVyc29uLTEiLCJjbGllbnRfaWQiOiJodHRwczovL3BhLmV4YW1wbGUvcGFjdCIsInNjb3BlIjoib3JkZXJzOnJlYWQgb3JkZXJzOnJlYWQiLCJncmFudF9pZCI6InBhY3RncmFudF8xIiwiaWF0IjoxNzkxMDAwMDAwLCJleHAiOjE3OTEwMDM2MDB9.y4ovponq61QC6jRheo2wRzTYVbcOSQ1ssX2Hpwem0Kejs0xp7wpqq4O4BtOtNxavS2aAhfWJE8wQ0iT7aXZN4g",
+      "expect": null
+    },
+    {
+      "name": "another_personal_agent",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUvb2F1dGgiLCJhdWQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzdWIiOiJwZXJzb24tMSIsImNsaWVudF9pZCI6Imh0dHBzOi8vb3RoZXIuZXhhbXBsZSIsInNjb3BlIjoib3JkZXJzOnJlYWQgb3JkZXJzOnJlYWQiLCJncmFudF9pZCI6InBhY3RncmFudF8xIiwiaWF0IjoxNzkxMDAwMDAwLCJleHAiOjE3OTEwMDM2MDB9.bfYSuwWJ9YkD1Qvpk7I8x_NJQ9jHvfivcL1v7z4BXXI5tVXwj1ZFYYpgc6hAjWcQYAgMpPlD994Vzu4mZt89HQ",
+      "expect": null
+    },
+    {
+      "name": "expired",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUvb2F1dGgiLCJhdWQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzdWIiOiJwZXJzb24tMSIsImNsaWVudF9pZCI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0Iiwic2NvcGUiOiJvcmRlcnM6cmVhZCBvcmRlcnM6cmVhZCIsImdyYW50X2lkIjoicGFjdGdyYW50XzEiLCJpYXQiOjE3OTEwMDAwMDAsImV4cCI6MTc5MDk5OTg4MH0.LqM23amXGQQnrqD-jbABhV8FLMBaGS_XUvo0FsoNulrvvcqRg0RfEenDnmJwwyPliYmXfIJ8ZvqicKfKTmxJoQ",
+      "expect": null
+    },
+    {
+      "name": "inside_the_skew",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUvb2F1dGgiLCJhdWQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzdWIiOiJwZXJzb24tMSIsImNsaWVudF9pZCI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0Iiwic2NvcGUiOiJvcmRlcnM6cmVhZCBvcmRlcnM6cmVhZCIsImdyYW50X2lkIjoicGFjdGdyYW50XzEiLCJpYXQiOjE3OTEwMDAwMDAsImV4cCI6MTc5MDk5OTk5MH0.sEdfzpL_uzRZU9Ka5aI535g-4pW7Y8vXO6T1yC-l1j09ZiL0IL8viRmbdKPiqPGjXhAu1GMOu5-aImQ4VU9phg",
+      "expect": {
+        "person": "person-1",
+        "scopes": [
+          "orders:read"
+        ],
+        "grant_id": "pactgrant_1",
+        "interface_url": "https://a2a.agentmesh.ai/a2a/UBRANDEXAMPLE",
+        "expires_at": 1790999990
+      }
+    },
+    {
+      "name": "not_an_access_token",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUvb2F1dGgiLCJhdWQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzdWIiOiJwZXJzb24tMSIsImNsaWVudF9pZCI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0Iiwic2NvcGUiOiJvcmRlcnM6cmVhZCBvcmRlcnM6cmVhZCIsImdyYW50X2lkIjoicGFjdGdyYW50XzEiLCJpYXQiOjE3OTEwMDAwMDAsImV4cCI6MTc5MTAwMzYwMH0.XDN4QgXmFKzQ3XvWGo25qf8YJpanR_CUwziHOqVTV274nRCsPzAf29-HloqdbJDHw3EoCIQFV9ZmIiIpSNIDQQ",
+      "expect": null
+    },
+    {
+      "name": "another_key",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBQeXBxREhZMkE5NmlMLWxEU0swaTQwVzRQUGJHdWlxRDFQV1VLSGdkYUkiLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUvb2F1dGgiLCJhdWQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzdWIiOiJwZXJzb24tMSIsImNsaWVudF9pZCI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0Iiwic2NvcGUiOiJvcmRlcnM6cmVhZCBvcmRlcnM6cmVhZCIsImdyYW50X2lkIjoicGFjdGdyYW50XzEiLCJpYXQiOjE3OTEwMDAwMDAsImV4cCI6MTc5MTAwMzYwMH0.nhz8Q-P6rQ3Njd5cr3dnDXlv6boEi5ZEzrNbajqXUYjm4zc1uxtuWJpbyqnfLIGME8vBiqpfxxezK3yw0jYc-g",
+      "expect": null
+    },
+    {
+      "name": "issuer_not_the_interface",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJhdWQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzdWIiOiJwZXJzb24tMSIsImNsaWVudF9pZCI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0Iiwic2NvcGUiOiJvcmRlcnM6cmVhZCBvcmRlcnM6cmVhZCIsImdyYW50X2lkIjoicGFjdGdyYW50XzEiLCJpYXQiOjE3OTEwMDAwMDAsImV4cCI6MTc5MTAwMzYwMH0.Pnv1lgxotd2LtWP8uK9oVWTxXVqZukr-z3xGnMFrFbzZUVhO_j8X42vJtjGJqKW5Go8yyHrSW1kPRMinxu6-1Q",
+      "expect": null
+    },
+    {
+      "name": "no_scope",
+      "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUvb2F1dGgiLCJhdWQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzdWIiOiJwZXJzb24tMSIsImNsaWVudF9pZCI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0IiwiZ3JhbnRfaWQiOiJwYWN0Z3JhbnRfMSIsImlhdCI6MTc5MTAwMDAwMCwiZXhwIjoxNzkxMDAzNjAwfQ.8bdlmWAtIoigtwfGnneHwdFJQdtrJuunyMr4aLcKNDBBqvc7_UKOG8I6YSuLpoCrg8zJtZRzU9WZ9nLC2JAPkA",
+      "expect": null
+    }
+  ],
+  "pa_jwt": {
+    "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6Im0zM2txUDZiSTJoM096MlJjWi04d2taVmRZeGJQSFJvWnVSSU5uLUIzTFEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BhLmV4YW1wbGUvcGFjdCIsInN1YiI6InBlcnNvbi0xIiwiYXVkIjoiaHR0cHM6Ly9wcm92aWRlci5leGFtcGxlL2EyYSIsImlhdCI6MTc5MTAwMDAwMCwiZXhwIjoxNzkxMDAwMTIwfQ.gCMA6oyaTUhCp8ki65WBMmacvDZ21-hbzKTu1FKstM9kAgrjAmVhnOTOP6iT2v01R6U594LlvSgHKot5AzoYiw",
+    "claims": {
+      "iss": "https://pa.example/pact",
+      "sub": "person-1",
+      "aud": "https://provider.example/a2a",
+      "iat": 1791000000,
+      "exp": 1791000120
+    }
+  },
+  "receipts": [
+    {
+      "name": "ok",
+      "receipt": {
+        "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJwYWN0LXJlY2VpcHQrandzIn0.eyJncmFudElkIjoicGFjdGdyYW50XzEiLCJ1c2VyIjoicGVyc29uLTEiLCJwYSI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0IiwiYnJhbmQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzY29wZXNVc2VkIjpbIm9yZGVyczpyZWFkIl0sImFjdGlvbnMiOlt7InRvb2wiOiJsb29rdXBfb3JkZXJzIn0seyJ0b29sIjoiY2FuY2VsX29yZGVyIiwiYXJnc0hhc2giOiJ4dnR0Rm5Bd3VSeEpQbGZ4RUQ0dE5OQk1CSUU2djdHeDBUTjhlZlZ3c2pvIn1dLCJ0cyI6IjIwMjYtMTAtMDdUMDM6NDQ6MDAuMDAwWiJ9.pFmobzsAhI0r_XLO_ScnNRT5OkUSfC78Bcenv6ndTHhN6nB6ifGO46H5IigFu3hJiUeG6ZiAb4O4IONM9qMIHw",
+        "claims": {
+          "grantId": "pactgrant_1",
+          "user": "person-1",
+          "pa": "https://pa.example/pact",
+          "brand": "https://a2a.agentmesh.ai/a2a/UBRANDEXAMPLE",
+          "scopesUsed": [
+            "orders:read"
+          ],
+          "actions": [
+            {
+              "tool": "lookup_orders"
+            },
+            {
+              "tool": "cancel_order",
+              "argsHash": "xvttFnAwuRxJPlfxED4tNNBMBIE6v7Gx0TN8efVwsjo"
+            }
+          ],
+          "ts": "2026-10-07T03:44:00.000Z"
+        }
+      },
+      "expected": {},
+      "expect": null
+    },
+    {
+      "name": "expected_matches",
+      "receipt": {
+        "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJwYWN0LXJlY2VpcHQrandzIn0.eyJncmFudElkIjoicGFjdGdyYW50XzEiLCJ1c2VyIjoicGVyc29uLTEiLCJwYSI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0IiwiYnJhbmQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzY29wZXNVc2VkIjpbIm9yZGVyczpyZWFkIl0sImFjdGlvbnMiOlt7InRvb2wiOiJsb29rdXBfb3JkZXJzIn0seyJ0b29sIjoiY2FuY2VsX29yZGVyIiwiYXJnc0hhc2giOiJ4dnR0Rm5Bd3VSeEpQbGZ4RUQ0dE5OQk1CSUU2djdHeDBUTjhlZlZ3c2pvIn1dLCJ0cyI6IjIwMjYtMTAtMDdUMDM6NDQ6MDAuMDAwWiJ9.pFmobzsAhI0r_XLO_ScnNRT5OkUSfC78Bcenv6ndTHhN6nB6ifGO46H5IigFu3hJiUeG6ZiAb4O4IONM9qMIHw",
+        "claims": {
+          "grantId": "pactgrant_1",
+          "user": "person-1",
+          "pa": "https://pa.example/pact",
+          "brand": "https://a2a.agentmesh.ai/a2a/UBRANDEXAMPLE",
+          "scopesUsed": [
+            "orders:read"
+          ],
+          "actions": [
+            {
+              "tool": "lookup_orders"
+            },
+            {
+              "tool": "cancel_order",
+              "argsHash": "xvttFnAwuRxJPlfxED4tNNBMBIE6v7Gx0TN8efVwsjo"
+            }
+          ],
+          "ts": "2026-10-07T03:44:00.000Z"
+        }
+      },
+      "expected": {
+        "grantId": "pactgrant_1",
+        "pa": "https://pa.example/pact"
+      },
+      "expect": null
+    },
+    {
+      "name": "expected_differs",
+      "receipt": {
+        "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJwYWN0LXJlY2VpcHQrandzIn0.eyJncmFudElkIjoicGFjdGdyYW50XzEiLCJ1c2VyIjoicGVyc29uLTEiLCJwYSI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0IiwiYnJhbmQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzY29wZXNVc2VkIjpbIm9yZGVyczpyZWFkIl0sImFjdGlvbnMiOlt7InRvb2wiOiJsb29rdXBfb3JkZXJzIn0seyJ0b29sIjoiY2FuY2VsX29yZGVyIiwiYXJnc0hhc2giOiJ4dnR0Rm5Bd3VSeEpQbGZ4RUQ0dE5OQk1CSUU2djdHeDBUTjhlZlZ3c2pvIn1dLCJ0cyI6IjIwMjYtMTAtMDdUMDM6NDQ6MDAuMDAwWiJ9.pFmobzsAhI0r_XLO_ScnNRT5OkUSfC78Bcenv6ndTHhN6nB6ifGO46H5IigFu3hJiUeG6ZiAb4O4IONM9qMIHw",
+        "claims": {
+          "grantId": "pactgrant_1",
+          "user": "person-1",
+          "pa": "https://pa.example/pact",
+          "brand": "https://a2a.agentmesh.ai/a2a/UBRANDEXAMPLE",
+          "scopesUsed": [
+            "orders:read"
+          ],
+          "actions": [
+            {
+              "tool": "lookup_orders"
+            },
+            {
+              "tool": "cancel_order",
+              "argsHash": "xvttFnAwuRxJPlfxED4tNNBMBIE6v7Gx0TN8efVwsjo"
+            }
+          ],
+          "ts": "2026-10-07T03:44:00.000Z"
+        }
+      },
+      "expected": {
+        "user": "person-2"
+      },
+      "expect": "expected"
+    },
+    {
+      "name": "claims_differ",
+      "receipt": {
+        "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBrUDhKdXJfdTBJckNOQWQzSnRYcUpoQVZBT3BaU3hqcXN3N2x6bjQ5ZG8iLCJ0eXAiOiJwYWN0LXJlY2VpcHQrandzIn0.eyJncmFudElkIjoicGFjdGdyYW50XzEiLCJ1c2VyIjoicGVyc29uLTEiLCJwYSI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0IiwiYnJhbmQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzY29wZXNVc2VkIjpbIm9yZGVyczpyZWFkIl0sImFjdGlvbnMiOlt7InRvb2wiOiJsb29rdXBfb3JkZXJzIn0seyJ0b29sIjoiY2FuY2VsX29yZGVyIiwiYXJnc0hhc2giOiJ4dnR0Rm5Bd3VSeEpQbGZ4RUQ0dE5OQk1CSUU2djdHeDBUTjhlZlZ3c2pvIn1dLCJ0cyI6IjIwMjYtMTAtMDdUMDM6NDQ6MDAuMDAwWiJ9.pFmobzsAhI0r_XLO_ScnNRT5OkUSfC78Bcenv6ndTHhN6nB6ifGO46H5IigFu3hJiUeG6ZiAb4O4IONM9qMIHw",
+        "claims": {
+          "grantId": "pactgrant_1",
+          "user": "person-1",
+          "pa": "https://pa.example/pact",
+          "brand": "https://a2a.agentmesh.ai/a2a/UBRANDEXAMPLE",
+          "scopesUsed": [
+            "orders:cancel"
+          ],
+          "actions": [
+            {
+              "tool": "lookup_orders"
+            },
+            {
+              "tool": "cancel_order",
+              "argsHash": "xvttFnAwuRxJPlfxED4tNNBMBIE6v7Gx0TN8efVwsjo"
+            }
+          ],
+          "ts": "2026-10-07T03:44:00.000Z"
+        }
+      },
+      "expected": {},
+      "expect": "claims_differ"
+    },
+    {
+      "name": "another_key",
+      "receipt": {
+        "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjBQeXBxREhZMkE5NmlMLWxEU0swaTQwVzRQUGJHdWlxRDFQV1VLSGdkYUkiLCJ0eXAiOiJwYWN0LXJlY2VpcHQrandzIn0.eyJncmFudElkIjoicGFjdGdyYW50XzEiLCJ1c2VyIjoicGVyc29uLTEiLCJwYSI6Imh0dHBzOi8vcGEuZXhhbXBsZS9wYWN0IiwiYnJhbmQiOiJodHRwczovL2EyYS5hZ2VudG1lc2guYWkvYTJhL1VCUkFOREVYQU1QTEUiLCJzY29wZXNVc2VkIjpbIm9yZGVyczpyZWFkIl0sImFjdGlvbnMiOlt7InRvb2wiOiJsb29rdXBfb3JkZXJzIn0seyJ0b29sIjoiY2FuY2VsX29yZGVyIiwiYXJnc0hhc2giOiJ4dnR0Rm5Bd3VSeEpQbGZ4RUQ0dE5OQk1CSUU2djdHeDBUTjhlZlZ3c2pvIn1dLCJ0cyI6IjIwMjYtMTAtMDdUMDM6NDQ6MDAuMDAwWiJ9.bGLYPbo_47B--epNL1PLmNW73n4FmTtxS2NIBhQzu3yp-csLa-ytkwPt0faXEE8otXRc3P4M0i28ypH4aA3qjA",
+        "claims": {
+          "grantId": "pactgrant_1",
+          "user": "person-1",
+          "pa": "https://pa.example/pact",
+          "brand": "https://a2a.agentmesh.ai/a2a/UBRANDEXAMPLE",
+          "scopesUsed": [
+            "orders:read"
+          ],
+          "actions": [
+            {
+              "tool": "lookup_orders"
+            },
+            {
+              "tool": "cancel_order",
+              "argsHash": "xvttFnAwuRxJPlfxED4tNNBMBIE6v7Gx0TN8efVwsjo"
+            }
+          ],
+          "ts": "2026-10-07T03:44:00.000Z"
+        }
+      },
+      "expected": {},
+      "expect": "signature"
+    }
+  ],
+  "args_hashes": [
+    {
+      "input": "LG-1043",
+      "hash": "xvttFnAwuRxJPlfxED4tNNBMBIE6v7Gx0TN8efVwsjo"
+    },
+    {
+      "input": "",
+      "hash": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+    },
+    {
+      "input": "Grüße 🚀",
+      "hash": "amPsVru5TPQVoxMepOWiTvxoab_Wl6aJeMCFzuLBcA4"
+    },
+    {
+      "input": {
+        "b": 1,
+        "a": 2
+      },
+      "hash": "02JqwwqH5vemQoIzs8aCmZdoZfpVCOQmfFQVx2r3p3I"
+    },
+    {
+      "input": {
+        "order": "LG-1043",
+        "reason": "changed my mind",
+        "items": [
+          3,
+          1.5,
+          null,
+          true
+        ]
+      },
+      "hash": "kCepmJLpTqqUhpjyUeWmlUT5KIQxj0_1CKgv8dLiI7c"
+    },
+    {
+      "input": [
+        1,
+        "two",
+        {
+          "three": 3
+        }
+      ],
+      "hash": "VjhoMIG1rO2mL5YLy5GaLHcwd7b9yy5DS-umTDbQ-Nk"
+    }
+  ],
+  "reports": [
+    {
+      "call": "pact_report",
+      "args": [
+        "Done.",
+        [
+          "orders:read",
+          "orders:read"
+        ],
+        [
+          {
+            "tool": "lookup_orders"
+          },
+          {
+            "tool": "cancel_order",
+            "argsHash": "h1"
+          }
+        ]
+      ],
+      "out": {
+        "text": "Done.",
+        "pact": {
+          "scopes_used": [
+            "orders:read"
+          ],
+          "actions": [
+            {
+              "tool": "lookup_orders"
+            },
+            {
+              "tool": "cancel_order",
+              "argsHash": "h1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "call": "pact_needs_permission",
+      "args": [
+        "Need your OK.",
+        [
+          "orders:cancel",
+          "orders:cancel"
+        ]
+      ],
+      "out": {
+        "text": "Need your OK.",
+        "pact": {
+          "missing_scopes": [
+            "orders:cancel"
+          ]
+        }
+      }
+    },
+    {
+      "call": "report_text",
+      "args": [
+        {
+          "text": "Done.",
+          "pact": {
+            "scopes_used": [
+              "orders:read"
+            ],
+            "actions": [
+              {
+                "tool": "lookup_orders"
+              },
+              {
+                "tool": "cancel_order",
+                "argsHash": "h1"
+              }
+            ]
+          }
+        }
+      ],
+      "out": "{\"text\":\"Done.\",\"pact\":{\"scopes_used\":[\"orders:read\"],\"actions\":[{\"tool\":\"lookup_orders\"},{\"tool\":\"cancel_order\",\"argsHash\":\"h1\"}]}}"
+    }
+  ],
+  "turn_schema": "https://schemas.agentmesh.ai/pact-delegation/v1",
+  "gateways": [
+    "https://a2a.agentmesh.ai",
+    "https://a2a.dev.agentmesh.ai"
+  ]
+}

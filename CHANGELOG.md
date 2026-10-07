@@ -36,3 +36,12 @@ The first version.
 - A refused credential renewal raises `CredentialRefusedError`, which carries
   the mesh's code (`agent_paused` and `agent_terminated` mean the kill switch),
   `retry_after_seconds` and the stopped agents.
+- PACT 1.0 (`agentmesh.pact`, with `pip install "agentmesh[pact]"`), the same
+  helpers as the TypeScript and Rust SDKs. For an agent serving a business:
+  the PACT turn from the envelope's meta or a job's context bag,
+  `check_delegation` (and `check_delegation_fetching_keys`), `missing_scopes`,
+  `pact_report`, `pact_needs_permission`, `report_text` and `args_hash`. For a
+  personal-agent platform: `sign_pa_jwt`, `generate_es256_key`,
+  `send_pact_message` (a reply with its receipt, or `auth_required` with the
+  link to show the person) and `verify_receipt`. Held to the TypeScript SDK by
+  `tests/vectors/pact-ts-vectors.json`.
