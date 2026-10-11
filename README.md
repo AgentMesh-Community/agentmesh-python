@@ -275,8 +275,9 @@ repository: `node tools/gen-pact-vectors.mjs <path to an AgentMesh checkout>`.
 ## Documentation
 
 - Developer docs: https://dev.agentmesh.ai
-- The protocol specification and conformance suite:
-  https://github.com/jeffrschneider/agentmesh-protocol
+- The protocol this SDK implements, Agent Messaging: https://agentmessaging.ai
+- Its specification and conformance suite:
+  https://github.com/jeffrschneider/agent-messaging
 - The other SDKs: https://github.com/AgentMesh-Community/agentmesh-typescript
   and https://github.com/AgentMesh-Community/agentmesh-rust
 - What is built, what is not, and why: `docs/PLAN.md`
